@@ -4,10 +4,10 @@ Custom DNS server intended to be used in conjunction with [SSSL](https://github.
 ## Config
 The only 2 addresses required are for `conntest.nintendowifi.net` and `account.nintendo.net`. These can either be set using the default address or explicitly mapping them. Additional addresses may be added using `SSSL_DNS_MAP`.
 
-| Name                       | Description                                                                            | Required                      |
-|----------------------------|----------------------------------------------------------------------------------------|-------------------------------|
-| `SSSL_DNS_DEFAULT_ADDRESS` | The default address to use for `conntest.nintendowifi.net` and `account.nintendo.net`. | Only if not explicitly mapped |
-| `SSSL_DNS_DEFAULT_ADDRESS` | The default address to use for `conntest.nintendowifi.net` and `account.nintendo.net`. | Only if not explicitly mapped |
+| Name                       | Description                                                                            | Required                              |
+|----------------------------|----------------------------------------------------------------------------------------|---------------------------------------|
+| `SSSL_DNS_DEFAULT_ADDRESS` | The default address to use for `conntest.nintendowifi.net` and `account.nintendo.net`. | Only if not explicitly mapped         |
+| `SSSL_DNS_MAP_hostname`    | An explicit mapping of a hostname to an address.                                       | Only if not using the default address |
 
 ### Example:
 
