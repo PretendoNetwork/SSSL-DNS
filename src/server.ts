@@ -57,8 +57,7 @@ const server = createServer({
 });
 
 server.on('listening', () => {
-	const config = {
-		//singleLine: true,
+	const tableConfig = {
 		border: {
 			topBody: '─',
 			topJoin: '┬',
@@ -105,7 +104,7 @@ server.on('listening', () => {
 	}
 
 	console.log(colors.green('SSSL-DNS listening on the following addresses'));
-	console.log(table(tableData, config));
+	console.log(table(tableData, tableConfig));
 });
 
 server.listen({
