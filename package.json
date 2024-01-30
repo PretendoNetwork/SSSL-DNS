@@ -1,0 +1,30 @@
+{
+	"name": "@pretendonetwork/sssl-dns",
+	"version": "1.0.0",
+	"description": "TCustom DNS server intended to be used in conjunction with SSSL",
+	"main": "dist/server.js",
+	"scripts": {
+		"lint": "npx eslint .",
+		"build": "npm run lint && npm run clean && npx tsc && npx tsc-alias && npm run copy-files",
+		"clean": "npx rimraf ./dist",
+		"copy-files": "cp package.json dist/package.json && cp README.md dist/README.md",
+		"start": "node --enable-source-maps ."
+	},
+	"author": "PretendoNetwork",
+	"license": "AGPL-3.0",
+	"dependencies": {
+		"@colors/colors": "^1.6.0",
+		"dns2": "^2.1.0",
+		"dotenv": "^16.4.1",
+		"table": "^6.8.1"
+	},
+	"devDependencies": {
+		"@types/dns2": "^2.0.8",
+		"@types/node": "^20.11.10",
+		"@typescript-eslint/eslint-plugin": "^6.20.0",
+		"@typescript-eslint/parser": "^6.20.0",
+		"eslint": "^8.56.0",
+		"rimraf": "^5.0.5",
+		"tsc-alias": "^1.8.8"
+	}
+}
