@@ -34,6 +34,46 @@ if (!addressMap['account.nintendo.net']) {
 	addressMap['account.nintendo.net'] = process.env.SSSL_DNS_DEFAULT_ADDRESS;
 }
 
+let udpPort = 0;
+let tcpPort = 0;
+let dohPort = 0;
+
+if (process.env.SSSL_UDP_PORT) {
+	udpPort = Number(process.env.SSSL_UDP_PORT);
+}
+
+if (process.env.SSSL_TCP_PORT) {
+	tcpPort = Number(process.env.SSSL_TCP_PORT);
+}
+
+if (process.env.SSSL_DOH_PORT) {
+	dohPort = Number(process.env.SSSL_DOH_PORT);
+}
+
+if (Number.isNaN(udpPort)) {
+	console.log(colors.bgRed('Invalid UDP port'));
+	process.exit();
+}
+
+if (Number.isNaN(tcpPort)) {
+	console.log(colors.bgRed('Invalid TCP port'));
+	process.exit();
+}
+
+if (Number.isNaN(dohPort)) {
+	console.log(colors.bgRed('Invalid DoH port'));
+	process.exit();
+}
+
+if (udpPort === 0 && tcpPort === 0  && dohPort === 0) {
+	console.log(colors.bgRed('No server port set. Set one of SSSL_UDP_PORT, SSSL_TCP_PORT or SSSL_DOH_PORT'));
+	process.exit();
+}
+
+if (dohPort !== 0) {
+	console.log(colors.bgBrightYellow('DoH port set. The Wii U does not support DoH'));
+}
+
 const server = createServer({
 	udp: true,
 	handle: (request, send) => {
@@ -99,7 +139,7 @@ server.on('listening', () => {
 
 	if (addresses.doh) {
 		tableData.push([
-			colors.green('DOH'), colors.green(`${addresses.doh.address}:${addresses.doh.port}`)
+			colors.green('DoH'), colors.green(`${addresses.doh.address}:${addresses.doh.port}`)
 		]);
 	}
 
@@ -108,5 +148,7 @@ server.on('listening', () => {
 });
 
 server.listen({
-	udp: 53
+	udp: udpPort !== 0 ? udpPort : undefined,
+	tcp: tcpPort !== 0 ? tcpPort : undefined,
+	doh: dohPort !== 0 ? dohPort : undefined
 });
