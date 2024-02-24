@@ -11,12 +11,12 @@ FROM ubuntu:18.04 AS build
 # * Install build dependencies
 RUN apt-get update
 RUN apt-get install -y \
-    curl \
+	curl \
 	build-essential \
 	libffi-dev \
 	pkg-config \
 	libssl-dev \
-    libpcre3 \
+	libpcre3 \
 	libpcre3-dev \
 	zlib1g-dev
 
@@ -33,11 +33,11 @@ ARG nginx_version nginx_dir
 RUN curl -fSL http://nginx.org/download/nginx-${nginx_version}.tar.gz | tar xz -C /tmp/
 WORKDIR /tmp/nginx-${nginx_version}
 RUN ./configure \
-    --prefix=${nginx_dir} \
-    --with-http_ssl_module \
-    --with-openssl=/tmp/openssl-${openssl_version} \
-    --with-openssl-opt="enable-weak-ssl-ciphers" \
-    --with-pcre
+	--prefix=${nginx_dir} \
+	--with-http_ssl_module \
+	--with-openssl=/tmp/openssl-${openssl_version} \
+	--with-openssl-opt="enable-weak-ssl-ciphers" \
+	--with-pcre
 RUN make -j$(nproc)
 RUN make install
 
