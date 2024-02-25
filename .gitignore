@@ -133,3 +133,4 @@ dist
 dist
 docker/*.pem
 docker/*.key
+docker/nginx.conf
