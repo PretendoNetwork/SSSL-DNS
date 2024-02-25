@@ -60,6 +60,19 @@ if (udpPort === 0 && tcpPort === 0) {
 	process.exit();
 }
 
+if (udpPort === tcpPort) {
+	console.log(colors.bgRed('UDP and TCP ports cannot match'));
+	process.exit();
+}
+
+if (udpPort === 0) {
+	console.log(colors.bgYellow('UDP port not set. One will be randomly assigned'));
+}
+
+if (tcpPort === 0) {
+	console.log(colors.bgYellow('TCP port not set. One will be randomly assigned'));
+}
+
 const server = createServer({
 	udp: true,
 	tcp: true,
