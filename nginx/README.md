@@ -8,8 +8,8 @@ TLS 1.0/1.1 and legacy SSL ciphers, which are required for the Wii U.
 This uses standard Nginx configuration files. Use these two example files as a starting point:
 
 - `nginx.default.conf` is a simple Nginx configuration file that displays the default Nginx welcome page. It shows the
-  basic configuration needed to create a sever that supports the SSL ciphers needed by the Wii U and uses a generated
-  SSSL certificate.
+  basic configuration needed to create a server that uses an SSSL-patched certificate and supports the necessary legacy
+  SSL ciphers.
 - `nginx.example.conf` is an example Nginx configuration file that shows how to reverse-proxy incoming requests to a
   local Pretendo account server.
 
