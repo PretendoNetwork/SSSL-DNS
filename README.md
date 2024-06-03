@@ -5,7 +5,7 @@ This project contains a DNS server and a custom Nginx configuration intended to 
 
 ## Usage
 
-The provided [example Docker Compose file](../compose.yml) shows a setup that runs both the DNS server and Nginx
+The provided [example Docker Compose file](./compose.yml) shows a setup that runs both the DNS server and Nginx
 together. Here's how to set it up:
 
 1. Clone this repository: `git clone https://github.com/PretendoNetwork/SSSL-DNS.git`.
