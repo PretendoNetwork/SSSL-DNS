@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG openssl_version="1.1.1w"
-ARG openssl_dir="/usr/local/ssl"
+ARG openssl_dir="/opt/openssl"
 ARG nginx_version="1.24.0"
 ARG nginx_dir="/opt/nginx"
 
@@ -9,8 +9,8 @@ ARG nginx_dir="/opt/nginx"
 FROM ubuntu:18.04 AS build
 
 # * Install build dependencies
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update \
+	&& apt-get install -y \
 	curl \
 	build-essential \
 	libffi-dev \
@@ -18,7 +18,8 @@ RUN apt-get install -y \
 	libssl-dev \
 	libpcre3 \
 	libpcre3-dev \
-	zlib1g-dev
+	zlib1g-dev \
+	&& apt-get clean
 
 # * Download and compile old OpenSSL
 ARG openssl_version openssl_dir
@@ -41,12 +42,15 @@ RUN ./configure \
 RUN make -j$(nproc)
 RUN make install
 
-# * Use Ubuntu as we need to install several pieces of software
-FROM ubuntu:latest
+# * Use Ubuntu to run Nginx
+FROM ubuntu:latest AS final
+
+RUN apt-get update \
+	&& apt-get install -y \
+	libpcre3 \
+	&& apt-get clean
 
 # * Create required directories
-RUN mkdir /app
-RUN mkdir -p /etc/nginx/ssl
 RUN mkdir -p /var/log/nginx
 
 # * Move the nginx and OpenSSL to the container
@@ -58,26 +62,11 @@ COPY --from=build ${nginx_dir} ${nginx_dir}
 ENV PATH="${nginx_dir}/sbin:${PATH}"
 ENV LD_LIBRARY_PATH="${openssl_dir}/lib:${LD_LIBRARY_PATH}"
 
-# * Install NodeJS and PM2
-RUN apt-get update && apt-get install -y curl software-properties-common
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
-RUN apt-get install -y nodejs
-RUN npm install -g pm2
-
-# * Copy the built DNS server
-COPY dist /app/dist
-COPY package.json /app
-COPY .env /app
-
-# * Copy the nginx files
-COPY docker/nginx.conf /opt/nginx/conf/nginx.conf
-COPY docker/ca.pem /etc/nginx/ssl/ca.pem
-COPY docker/private.key /etc/nginx/ssl/private.key
+# * Copy the default nginx configuration
+COPY nginx.default.conf /opt/nginx/conf/nginx.conf
 
 # * nginx ports
 EXPOSE 80 443
 
-# * Start nginx and DNS server at boot
-WORKDIR /app
-RUN npm i
-CMD nginx -g 'daemon off;' & pm2 start . --no-daemon
+# * Start nginx
+CMD nginx -g 'daemon off;'
