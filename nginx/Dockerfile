@@ -5,8 +5,8 @@ ARG openssl_dir="/opt/openssl"
 ARG nginx_version="1.24.0"
 ARG nginx_dir="/opt/nginx"
 
-# * Use Ubuntu 18.04 as the build image as it's known-good for TLS 1.0/1.1
-FROM ubuntu:18.04 AS build
+
+FROM ubuntu:24.04 AS build
 
 # * Install build dependencies
 RUN apt-get update \
@@ -42,8 +42,8 @@ RUN ./configure \
 RUN make -j$(nproc)
 RUN make install
 
-# * Use Ubuntu to run Nginx
-FROM ubuntu:latest AS final
+
+FROM ubuntu:24.04 AS final
 
 # * Create required directories
 RUN mkdir -p /var/log/nginx
