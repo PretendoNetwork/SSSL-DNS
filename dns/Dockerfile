@@ -2,6 +2,7 @@
 
 ARG app_dir="/home/node/app"
 
+
 # * Base Node.js image
 FROM node:20-alpine AS base
 ARG app_dir
@@ -33,8 +34,6 @@ RUN npm run build
 FROM base AS final
 ARG app_dir
 
-RUN npm install -g pm2
-
 ENV NODE_ENV production
 USER node
 
@@ -43,4 +42,4 @@ COPY package.json .
 COPY --from=dependencies ${app_dir}/node_modules ${app_dir}/node_modules
 COPY --from=build ${app_dir}/dist ${app_dir}/dist
 
-CMD ["pm2-runtime", "start", "."]
+CMD ["node", "."]
