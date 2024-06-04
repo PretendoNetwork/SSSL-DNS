@@ -38,17 +38,12 @@ RUN ./configure \
 	--with-http_ssl_module \
 	--with-openssl=/tmp/openssl-${openssl_version} \
 	--with-openssl-opt="enable-weak-ssl-ciphers" \
-	--with-pcre
+	--without-http_rewrite_module
 RUN make -j$(nproc)
 RUN make install
 
 # * Use Ubuntu to run Nginx
 FROM ubuntu:latest AS final
-
-RUN apt-get update \
-	&& apt-get install -y \
-	libpcre3 \
-	&& apt-get clean
 
 # * Create required directories
 RUN mkdir -p /var/log/nginx
