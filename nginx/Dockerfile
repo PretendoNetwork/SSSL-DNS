@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1
 
 ARG openssl_version="1.1.1w"
-ARG openssl_dir="/opt/openssl"
 ARG nginx_version="1.24.0"
 ARG nginx_dir="/opt/nginx"
 
@@ -13,21 +12,13 @@ RUN apt-get update \
 	&& apt-get install -y \
 	curl \
 	build-essential \
-	libffi-dev \
 	pkg-config \
-	libssl-dev \
-	libpcre3 \
-	libpcre3-dev \
 	zlib1g-dev \
 	&& apt-get clean
 
-# * Download and compile old OpenSSL
-ARG openssl_version openssl_dir
+# * Download old OpenSSL
+ARG openssl_version
 RUN curl -fSL https://www.openssl.org/source/openssl-${openssl_version}.tar.gz | tar xz -C /tmp/
-WORKDIR /tmp/openssl-${openssl_version}
-RUN ./config --prefix=${openssl_dir} --openssldir=${openssl_dir} -Wl,-Bsymbolic-functions -fPIC shared
-RUN make -j$(nproc)
-RUN make install_sw
 
 # * Download and compile old nginx with custom OpenSSL
 ARG nginx_version nginx_dir
@@ -49,8 +40,7 @@ FROM ubuntu:24.04 AS final
 RUN mkdir -p /var/log/nginx
 
 # * Move the nginx and OpenSSL to the container
-ARG openssl_dir nginx_dir
-COPY --from=build ${openssl_dir} ${openssl_dir}
+ARG nginx_dir
 COPY --from=build ${nginx_dir} ${nginx_dir}
 
 # * Set PATH to include custom OpenSSL and nginx
