@@ -43,9 +43,8 @@ RUN mkdir -p /var/log/nginx
 ARG nginx_dir
 COPY --from=build ${nginx_dir} ${nginx_dir}
 
-# * Set PATH to include custom OpenSSL and nginx
+# * Set PATH to include custom nginx
 ENV PATH="${nginx_dir}/sbin:${PATH}"
-ENV LD_LIBRARY_PATH="${openssl_dir}/lib:${LD_LIBRARY_PATH}"
 
 # * Copy the default nginx configuration
 COPY nginx.default.conf /opt/nginx/conf/nginx.conf
