@@ -130,7 +130,6 @@ dist
 .pnp.*
 
 # custom
-dist
-docker/*.pem
-docker/*.key
-docker/nginx.conf
+nginx/nginx.conf
+nginx/*.pem
+nginx/*.key

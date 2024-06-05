@@ -3,6 +3,10 @@ import { table } from 'table';
 import colors from '@colors/colors';
 import dotenv from 'dotenv';
 
+process.on('SIGTERM', () => {
+	process.exit();
+});
+
 dotenv.config();
 
 const addressMap: Record<string, string> = {};

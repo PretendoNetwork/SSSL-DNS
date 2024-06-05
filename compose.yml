@@ -1,0 +1,21 @@
+# Example of a Docker Compose file that runs the DNS and Nginx containers together
+
+services:
+  dns:
+    build: ./dns
+    restart: always
+    ports:
+      - 53:53/udp
+    env_file:
+      - ./dns/.env
+
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/cert-chain.pem:/opt/nginx/ssl/ca.pem:ro
+      - ./nginx/ssl-cert-private-key.pem:/opt/nginx/ssl/private.key:ro
+      - ./nginx/nginx.conf:/opt/nginx/conf/nginx.conf:ro
