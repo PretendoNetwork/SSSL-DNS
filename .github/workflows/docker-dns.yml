@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: sssl-dns
+  IMAGE_NAME: ${{ github.repository_owner }}/sssl-dns
 
 jobs:
   build-publish:

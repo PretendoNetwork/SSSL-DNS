@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: sssl-nginx
+  IMAGE_NAME: ${{ github.repository_owner }}/sssl-nginx
 
 jobs:
   build-publish:
