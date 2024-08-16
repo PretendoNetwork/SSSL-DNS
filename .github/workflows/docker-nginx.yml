@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: sssl-nginx
+  IMAGE_NAME: ${{ github.repository_owner }}/sssl-nginx
 
 jobs:
   build-publish:
@@ -20,6 +20,9 @@ jobs:
       packages: write
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up QEMU for Docker
         uses: docker/setup-qemu-action@v3
 
@@ -48,7 +51,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v6
         with:
-          context: dns
+          context: ./nginx
           platforms: linux/amd64,linux/arm64
           push: ${{ env.SHOULD_PUSH_IMAGE }}
           tags: ${{ steps.meta.outputs.tags }}
