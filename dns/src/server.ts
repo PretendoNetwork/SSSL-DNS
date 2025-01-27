@@ -1,4 +1,4 @@
-import { createServer, Packet } from 'dns2';
+import DNS, { createServer, DnsResponse, Packet } from 'dns2';
 import { table } from 'table';
 import colors from '@colors/colors';
 import dotenv from 'dotenv';
@@ -10,6 +10,11 @@ process.on('SIGTERM', () => {
 dotenv.config();
 
 const addressMap: Record<string, string> = {};
+const wiimmfiResolver = new DNS({
+	nameServers: [
+		'95.217.77.181' // * https://wiimmfi.de/patcher/dnspatch
+	]
+});
 
 for (const variable in process.env) {
 	if (variable.startsWith('SSSL_DNS_MAP')) {
@@ -80,12 +85,14 @@ if (tcpPort === 0) {
 const server = createServer({
 	udp: true,
 	tcp: true,
-	handle: (request, send) => {
+	handle: async (request, send) => {
 		const [ question ] = request.questions;
 		const { name } = question;
+		let response: DnsResponse | null = null;
 
 		if (addressMap[name]) {
-			const response = Packet.createResponseFromRequest(request);
+			// * If requesting one of our known domains, use our servers
+			response = Packet.createResponseFromRequest(request);
 
 			response.answers.push({
 				name,
@@ -94,7 +101,13 @@ const server = createServer({
 				ttl: 300,
 				address: addressMap[name]
 			});
+		} else if (name.endsWith('nintendowifi.net')) {
+			// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
+			// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
+			response = await wiimmfiResolver.resolve('nas.nintendowifi.net');
+		}
 
+		if (response) {
 			send(response);
 		}
 	}
