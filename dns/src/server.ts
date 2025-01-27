@@ -1,7 +1,8 @@
-import DNS, { createServer, DnsResponse, Packet } from 'dns2';
+import DNS, { createServer, Packet } from 'dns2';
 import { table } from 'table';
 import colors from '@colors/colors';
 import dotenv from 'dotenv';
+import type { DnsResponse } from 'dns2';
 
 process.on('SIGTERM', () => {
 	process.exit();
@@ -90,21 +91,26 @@ const server = createServer({
 		const { name } = question;
 		let response: DnsResponse | null = null;
 
-		if (addressMap[name]) {
-			// * If requesting one of our known domains, use our servers
-			response = Packet.createResponseFromRequest(request);
+		try {
+			if (addressMap[name]) {
+				// * If requesting one of our known domains, use our servers
+				response = Packet.createResponseFromRequest(request);
 
-			response.answers.push({
-				name,
-				type: Packet.TYPE.A,
-				class: Packet.CLASS.IN,
-				ttl: 300,
-				address: addressMap[name]
-			});
-		} else if (name.endsWith('nintendowifi.net')) {
-			// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
-			// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
-			response = await wiimmfiResolver.resolve('nas.nintendowifi.net');
+				response.answers.push({
+					name,
+					type: Packet.TYPE.A,
+					class: Packet.CLASS.IN,
+					ttl: 300,
+					address: addressMap[name]
+				});
+			} else if (name.endsWith('nintendowifi.net')) {
+				// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
+				// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
+				response = await wiimmfiResolver.resolve('nas.nintendowifi.net');
+			}
+		} catch {
+			// * Eat errors for now
+			// TODO - Send a SERVFAIL response
 		}
 
 		if (response) {
