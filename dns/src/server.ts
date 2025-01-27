@@ -114,7 +114,7 @@ const server = createServer({
 			} else if (name.endsWith('nintendowifi.net')) {
 				// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
 				// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
-				response = await wiimmfiResolver.resolve('nas.nintendowifi.net');
+				response = await wiimmfiResolver.resolve(name);
 			} else {
 				// * Fallback to public DNS servers for everything else
 				response = await fallbackResolver.resolve(name);
