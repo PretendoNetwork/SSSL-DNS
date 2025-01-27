@@ -16,6 +16,14 @@ const wiimmfiResolver = new DNS({
 		'95.217.77.181' // * https://wiimmfi.de/patcher/dnspatch
 	]
 });
+const fallbackResolver = new DNS({
+	// * dns2 will run queries to all of these servers at once, and use the first response it gets
+	nameServers: [
+		'9.9.9.9', // * https://quad9.net
+		'1.1.1.1', // * https://www.cloudflare.com/learning/dns/what-is-1.1.1.1
+		'8.8.8.8' // * https://developers.google.com/speed/public-dns
+	]
+});
 
 for (const variable in process.env) {
 	if (variable.startsWith('SSSL_DNS_MAP')) {
@@ -107,6 +115,9 @@ const server = createServer({
 				// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
 				// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
 				response = await wiimmfiResolver.resolve('nas.nintendowifi.net');
+			} else {
+				// * Fallback to public DNS servers for everything else
+				response = await fallbackResolver.resolve(name);
 			}
 		} catch {
 			// * Eat errors for now
