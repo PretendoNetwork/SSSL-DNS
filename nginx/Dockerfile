@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG openssl_version="1.1.1w"
-ARG nginx_version="1.24.0"
+ARG nginx_version="1.31.8"
 ARG nginx_dir="/opt/nginx"
 
 
