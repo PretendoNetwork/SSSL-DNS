@@ -20,7 +20,7 @@ RUN apt-get update \
 ARG openssl_version
 RUN curl -fSL https://www.openssl.org/source/openssl-${openssl_version}.tar.gz | tar xz -C /tmp/
 
-# * Download and compile old nginx with custom OpenSSL
+# * Download and compile nginx with old custom OpenSSL
 ARG nginx_version nginx_dir
 RUN curl -fSL http://nginx.org/download/nginx-${nginx_version}.tar.gz | tar xz -C /tmp/
 WORKDIR /tmp/nginx-${nginx_version}
