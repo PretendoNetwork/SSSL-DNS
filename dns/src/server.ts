@@ -1,7 +1,8 @@
-import { createServer, Packet } from 'dns2';
+import DNS, { createServer, Packet } from 'dns2';
 import { table } from 'table';
 import colors from '@colors/colors';
 import dotenv from 'dotenv';
+import type { DnsResponse } from 'dns2';
 
 process.on('SIGTERM', () => {
 	process.exit();
@@ -10,6 +11,19 @@ process.on('SIGTERM', () => {
 dotenv.config();
 
 const addressMap: Record<string, string> = {};
+const wiimmfiResolver = new DNS({
+	nameServers: [
+		'95.217.77.181' // * https://wiimmfi.de/patcher/dnspatch
+	]
+});
+const fallbackResolver = new DNS({
+	// * dns2 will run queries to all of these servers at once, and use the first response it gets
+	nameServers: [
+		'9.9.9.9', // * https://quad9.net
+		'1.1.1.1', // * https://www.cloudflare.com/learning/dns/what-is-1.1.1.1
+		'8.8.8.8' // * https://developers.google.com/speed/public-dns
+	]
+});
 
 for (const variable in process.env) {
 	if (variable.startsWith('SSSL_DNS_MAP')) {
@@ -80,21 +94,37 @@ if (tcpPort === 0) {
 const server = createServer({
 	udp: true,
 	tcp: true,
-	handle: (request, send) => {
+	handle: async (request, send) => {
 		const [ question ] = request.questions;
 		const { name } = question;
+		let response: DnsResponse | null = null;
 
-		if (addressMap[name]) {
-			const response = Packet.createResponseFromRequest(request);
+		try {
+			if (addressMap[name]) {
+				// * If requesting one of our known domains, use our servers
+				response = Packet.createResponseFromRequest(request);
 
-			response.answers.push({
-				name,
-				type: Packet.TYPE.A,
-				class: Packet.CLASS.IN,
-				ttl: 300,
-				address: addressMap[name]
-			});
+				response.answers.push({
+					name,
+					type: Packet.TYPE.A,
+					class: Packet.CLASS.IN,
+					ttl: 300,
+					address: addressMap[name]
+				});
+			} else if (name.endsWith('nintendowifi.net')) {
+				// * Assume Wiimmfi. WiiLink NAS will not work with our DNS
+				// * NOTE - This still points conntest.nintendowifi.net to OUR servers, since the Wii U also uses it
+				response = await wiimmfiResolver.resolve(name);
+			} else {
+				// * Fallback to public DNS servers for everything else
+				response = await fallbackResolver.resolve(name);
+			}
+		} catch {
+			// * Eat errors for now
+			// TODO - Send a SERVFAIL response
+		}
 
+		if (response) {
 			send(response);
 		}
 	}
